@@ -1,0 +1,22 @@
+{
+  "built": "2026-10-21",
+  "stops": 5821,
+  "services": 654,
+  "stations": 213,
+  "interchangeStops": 678,
+  "sources": {
+    "stops": "LTA bus_stops.xml",
+    "services": "cheeaun/sgbusdata services.min.json + LTA route xml",
+    "stations": "LTA DataMall static: Train Station Codes and Chinese Names"
+  },
+  "stopFields": [
+    "lng",
+    "lat",
+    "name",
+    "road",
+    "stationCodes",
+    "stationName",
+    "stationLines",
+    "lineAbbrs"
+  ]
+}

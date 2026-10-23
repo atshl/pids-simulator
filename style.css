@@ -1,0 +1,376 @@
+/* ============================================================
+   PIDS Simulator — Singapore Bus Information Display
+   Design tokens: Lush Green set (sg-*) from PIDS.pen
+   ============================================================ */
+
+:root {
+  --sg-green-100: #E9F4C6;
+  --sg-green-300: #A9D94E;
+  --sg-green-500: #5BBF2E;
+  --sg-green-600: #5B8C00;
+  --sg-green-700: #3A5C00;
+  --sg-ink: #101418;
+  --sg-display: #141B21;
+  --sg-header: #1E272E;
+  --sg-row-light: #9FB2BF;
+  --sg-row-dark: #6E828F;
+  --sg-muted: #D7E0E6;
+  --sg-line: #D9E2E6;
+  --sg-paper: #F4F6F3;
+  --sg-white: #FFFFFF;
+  --sg-amber: #FF9E1B;
+  --sg-stop: #E11D25;
+  --sg-arrive: #FACC15;
+  --sg-signal: #3ED234;
+  --sg-mint: #7BEDD3;
+  --sg-blue: #3B82F6;
+  --sg-orange: #F97316;
+  --sg-heart: #E4002B;
+
+  /* type roles — $sg-font-sign / $sg-font-text / $sg-font-grot / $sg-font-data */
+  --font-sign: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;   /* Stroudley stand-in */
+  --font-companion: "Open Sans", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif; /* Ocean Sans stand-in */
+  --font-mono: "Geist Mono", ui-monospace, "SF Mono", "Cascadia Mono", Menlo, monospace;
+  --font-bell: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --page: #0B0F12;
+
+  /* the whole unit: 1280 sign + 24 gap + 268 panel */
+  --sign-w: 1280px;
+  --sign-h: 600px;
+  --panel-w: 268px;
+  --unit-gap: 24px;
+}
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; padding: 0; height: 100%; }
+
+/* The bus-interior photograph is the room the sign hangs in; the scrim keeps
+   the display legible over it. */
+body {
+  overflow: hidden;
+  background: var(--page) url("assets/interior.jpg") center / cover no-repeat fixed;
+  color: var(--sg-muted);
+  font-family: var(--font-companion);
+  -webkit-font-smoothing: antialiased;
+}
+
+body::before {
+  content: "";
+  position: fixed; inset: 0;
+  background: radial-gradient(120% 90% at 50% 38%, rgba(8, 12, 15, .58), rgba(8, 12, 15, .9));
+  pointer-events: none;
+}
+
+/* ───────────────────────── the unit ───────────────────────── */
+/* The display and its panel are one item: the app centres the unit and
+   fitUnit() scales the whole thing, so nothing ever drifts to the edges. */
+
+.app {
+  position: fixed; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+}
+
+.unit {
+  display: flex; align-items: stretch; gap: var(--unit-gap);
+  flex: 0 0 auto;
+  transform-origin: center center;
+}
+
+/* ───────────────────────── display ───────────────────────── */
+
+.stage {
+  position: relative;
+  flex: 0 0 auto;
+  width: var(--sign-w);
+  height: var(--sign-h);
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--sg-display);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, .6), 0 40px 80px -40px rgba(0, 0, 0, .95);
+}
+
+/* sign ------------------------------------------------------------------
+   Figma "PIDS" file (aLttgbqVyAlB0RlPBTOZs4) — Screens 1-4, 1280x600 safe zone.
+   Four 320px columns; marker centres at x = 160 + 320n.                     */
+
+.sign {
+  position: absolute; inset: 0;
+  width: var(--sign-w); height: var(--sign-h);
+  background: var(--sg-display);
+  overflow: hidden;
+  font-family: var(--font-sign);
+}
+
+/* band ------------------------------------------------------------------ */
+/* Flex, not absolute: the green service box grows to fit the service
+   number (Pencil Screen 4, C9UR11: "999A" -> 273px) and the destination or
+   BUS STOPPING callout takes the rest of the space up to the clock.        */
+
+.sign__band {
+  position: relative;
+  height: 150px;
+  background: var(--sg-header);
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  padding-right: 29px;
+}
+
+.sign__svc {
+  flex: 0 0 auto;
+  min-width: 190px;
+  height: 150px;
+  background: var(--sg-green-500);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 30px;
+}
+.sign__number {
+  font: 700 78px/1.22 var(--font-sign);
+  color: var(--sg-white);
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.sign__head {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 150px;
+  display: flex;
+  align-items: center;
+}
+.sign__destination {
+  width: 100%;
+  font: 700 78px/1.22 var(--font-sign);
+  color: var(--sg-white);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sign__callout {
+  width: 100%;
+  height: 100px; border-radius: 50px;
+  background: var(--sg-stop);
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 7px;
+  font: 700 80px/1.18 var(--font-sign);
+  color: var(--sg-white);
+}
+.sign__callout span { white-space: nowrap; }
+.sign__callout[hidden] { display: none; }
+
+.sign__clock {
+  flex: 0 0 auto;
+  width: 268px; height: 101px;
+  display: flex; align-items: center; gap: 25px; padding: 0 29px;
+  background: var(--sg-ink);
+  border: 3px solid var(--sg-muted);
+  border-radius: 32px;
+}
+.sign__clockicon { width: 29px; height: 29px; display: block; }
+.sign__time {
+  font: 400 50px/1.3 var(--font-mono);
+  color: var(--sg-white);
+  letter-spacing: 0;
+}
+
+/* area ------------------------------------------------------------------ */
+
+.sign__area { position: relative; height: 450px; background: var(--sg-display); overflow: hidden; }
+
+.sign__track { position: absolute; left: 0; top: 55px; width: 1280px; height: 96px; }
+.sign__names { position: absolute; left: 0; top: 175px; width: 1280px; height: 96px; }
+.sign__pills { position: absolute; left: 0; top: 296px; width: 1280px; height: 110px; }
+
+.srow {
+  position: absolute; inset: 0;
+  display: grid; grid-template-columns: repeat(4, 320px);
+}
+/* The marker is 106px (a 101px circle with a 5px ring) inside a 96px row:
+   keep the row at 96px so the marker stays centred on the bar at y=253. */
+.sign__track .srow { grid-template-rows: 96px; }
+/* The pill stack is centred on y=501: one pill 476, two 446+506, three 416+476+536. */
+.sign__pills .srow { grid-template-rows: 110px; }
+.srow > * { display: flex; align-items: center; justify-content: center; min-width: 0; }
+.sign__names .srow > * { align-items: flex-start; }
+
+.sign__bar {
+  position: absolute; left: 160px; top: 37px; height: 22px;
+  background: var(--sg-green-500);
+}
+
+.schev { position: absolute; top: 17px; width: 37px; height: 62px; }
+.schev img { position: absolute; top: 0; width: 29px; height: 62px; }
+.schev img:first-child { left: 0; }
+.schev img:last-child { left: 8px; }
+
+/* markers --------------------------------------------------------------- */
+
+/* Figma draws a 101px circle with a 5px stroke, so the mark reads as a
+   106px ring around a 96px colour disc. */
+.marker {
+  width: 106px; height: 106px; border-radius: 53px;
+  border: 5px solid var(--sg-white);
+  display: flex; align-items: center; justify-content: center;
+  flex: 0 0 106px;
+}
+.marker img { display: block; max-width: 46px; max-height: 46px; }
+.marker--next { background: var(--sg-row-dark); }
+.marker--upcoming { background: var(--sg-ink); }
+.marker--stopping { background: var(--sg-stop); }
+.marker--final { background: var(--sg-green-500); border-color: var(--sg-green-100); }
+
+/* names ----------------------------------------------------------------- */
+
+.sname {
+  max-width: 300px;
+  font: 700 40px/1.2 var(--font-sign);
+  color: var(--sg-white);
+  text-align: center;
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* pills ----------------------------------------------------------------- */
+
+.sign .spills { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.sign .spills__lines { display: flex; align-items: center; gap: 10px; }
+
+.sign .pill {
+  height: 50px; border-radius: 24px;
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 0 25px;
+  background: var(--sg-green-500);
+  font: 700 30px/1 var(--font-sign);
+  color: var(--sg-white);
+  white-space: nowrap;
+}
+.sign .pill--stop { background: var(--sg-stop); }
+.sign .pill--final { background: var(--sg-green-100); color: var(--sg-green-700); }
+.sign .pill--line { background: #748477; width: 100px; padding: 0 8px; }
+
+/* ───────────────────────── control panel ───────────────────────── */
+
+.panel {
+  flex: 0 0 var(--panel-w);
+  width: var(--panel-w);
+  height: var(--sign-h);
+  display: flex; flex-direction: column; gap: 14px;
+  padding: 18px 18px 14px;
+  background: rgba(16, 20, 24, .94);
+  border: 1px solid rgba(215, 224, 230, .14);
+  border-radius: 12px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, .6), 0 40px 80px -40px rgba(0, 0, 0, .95);
+  backdrop-filter: blur(10px);
+}
+
+.panel__head { display: flex; align-items: center; gap: 12px; flex: 0 0 auto; }
+
+.panel__mark {
+  width: 36px; height: 36px; border-radius: 10px; flex: none;
+  display: block;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .12), 0 8px 22px -10px var(--sg-green-500);
+}
+
+.panel__title {
+  display: flex; flex-direction: column; gap: 3px;
+  min-width: 0;
+  font: 800 15px/1 var(--font-companion);
+  color: var(--sg-white); letter-spacing: .02em;
+}
+.panel__title em {
+  font: 500 7.5px/1.1 var(--font-mono); font-style: normal;
+  letter-spacing: .05em; text-transform: uppercase; white-space: nowrap;
+  color: var(--sg-green-300);
+}
+
+.panel__fields { display: flex; flex-direction: column; gap: 12px; flex: 0 0 auto; }
+
+.field { display: block; }
+.field__label {
+  display: block;
+  font: 500 10px/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase;
+  color: var(--sg-row-light); margin-bottom: 6px;
+}
+
+.input {
+  width: 100%;
+  background: var(--sg-ink);
+  border: 1px solid rgba(215, 224, 230, .16);
+  border-radius: 9px;
+  color: var(--sg-white);
+  font: 500 13px/1 var(--font-companion);
+  padding: 10px 11px;
+  outline: none;
+}
+.input:focus { border-color: var(--sg-green-500); box-shadow: 0 0 0 3px rgba(91, 191, 46, .18); }
+.input.is-invalid { border-color: var(--sg-stop); }
+select.input { cursor: pointer; }
+select.input option { background: var(--sg-ink); }
+
+/* ─────────────────── Bus Stop Bell component ─────────────────── */
+/* One-way control: pressing it rings the bell for the next stop. Once rung
+   the bell latches — it cannot be un-rung, and it keeps ringing if pressed.
+   Pencil B7hK6 / Figma 19:53: yellow body, red 126x126 STOP button
+   (#E11D25, #A8131A when latched), two #D9D9D9 screws with #747474 slots.
+   The whole component is one SVG, so nothing can drift outside the body.  */
+
+.bell {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0; background: none; border: 0; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.bell:focus-visible { outline: 2px solid var(--sg-green-300); outline-offset: 4px; border-radius: 12px; }
+
+.bell__svg {
+  height: 100%; width: auto; max-width: 100%;
+  display: block;
+  filter: drop-shadow(0 18px 30px rgba(0, 0, 0, .55));
+  transition: filter .15s ease;
+}
+
+.bell__stoptxt {
+  font-family: var(--font-bell);
+  font-size: 40px;
+  font-weight: 200;
+  letter-spacing: 2px;
+  fill: var(--sg-white);
+}
+
+.bell:hover .bell__svg { filter: brightness(1.06) drop-shadow(0 18px 30px rgba(0, 0, 0, .55)); }
+.bell:active .bell__svg { filter: brightness(.94) drop-shadow(0 18px 30px rgba(0, 0, 0, .55)); }
+
+/* latched: the STOP button darkens to the Pencil latched colour */
+.bell.is-rung .bell__stopbtn { fill: #A8131A; }
+.bell.is-rung:hover .bell__svg { filter: drop-shadow(0 18px 30px rgba(0, 0, 0, .55)); }
+
+.panel__foot {
+  flex: 0 0 auto;
+  display: flex; justify-content: center;
+}
+
+.pill {
+  font: 500 10px/1 var(--font-mono);
+  letter-spacing: .06em; text-transform: uppercase;
+  padding: 7px 12px; border-radius: 999px;
+  border: 1px solid rgba(215, 224, 230, .18);
+  color: var(--sg-row-light);
+  white-space: nowrap;
+}
+.pill--live { color: var(--sg-green-300); border-color: rgba(169, 217, 78, .38); }
+.pill--live::before {
+  content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--sg-green-500); margin-right: 8px; vertical-align: 1px;
+  box-shadow: 0 0 10px var(--sg-green-500);
+}
+.pill--live.is-off { color: var(--sg-row-light); border-color: rgba(215, 224, 230, .18); }
+.pill--live.is-off::before { background: var(--sg-row-dark); box-shadow: none; }

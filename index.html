@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PIDS Simulator — Singapore Bus Passenger Information Display System</title>
+<meta name="description" content="Working simulation of a Singapore bus Passenger Information Display System, driven by real LTA bus and train-station data.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="icon" href="assets/icons/pids.svg" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@200;400&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<main class="app" id="app">
+  <div class="unit" id="unit">
+
+    <!-- ─────────────────────────── display ─────────────────────────── -->
+    <div class="stage" id="stage">
+      <div class="sign" id="sign" role="region" aria-label="Passenger information display">
+        <div class="sign__band">
+          <div class="sign__svc">
+            <span class="sign__number" id="signNumber">—</span>
+          </div>
+          <div class="sign__head">
+            <div class="sign__destination" id="signDest">—</div>
+            <div class="sign__callout" id="signCallout" hidden><span id="signCalloutText">BUS STOPPING</span></div>
+          </div>
+          <div class="sign__clock">
+            <img class="sign__clockicon" src="assets/icons/clock--white.svg" alt="">
+            <div class="sign__time" id="signTime">--:--</div>
+          </div>
+        </div>
+
+        <div class="sign__area">
+          <div class="sign__track" id="signTrack"></div>
+          <div class="sign__names" id="signNames"></div>
+          <div class="sign__pills" id="signPills"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─────────────────────────── control panel ─────────────────────────── -->
+    <aside class="panel">
+      <header class="panel__head">
+        <img class="panel__mark" src="assets/icons/pids.svg" alt="" aria-hidden="true">
+        <span class="panel__title">PIDS<em>Passenger Information Display System</em></span>
+      </header>
+
+      <div class="panel__fields">
+        <label class="field">
+          <span class="field__label">Bus service</span>
+          <input class="input" id="svcInput" list="svcList" placeholder="e.g. 50" autocomplete="off" spellcheck="false">
+        </label>
+        <datalist id="svcList"></datalist>
+
+        <label class="field">
+          <span class="field__label">Direction</span>
+          <select class="input" id="dirSelect"></select>
+        </label>
+      </div>
+
+      <button class="bell" id="btnRequest" type="button" aria-label="Ring the bus stop bell" title="Ring the bus stop bell" aria-pressed="false">
+        <!-- Bus Stop Bell — Pencil B7hK6 (144 x 377), Figma 19:53.
+             Drawn as one SVG so the body, screws and STOP button can never
+             drift apart; the viewBox keeps the Figma coordinates. -->
+        <svg class="bell__svg" viewBox="0 572 144 377" fill="none" aria-hidden="true" focusable="false">
+          <path d="M72.3042 571.996C84.3044 571.996 111 574.996 111 574.996C111.064 575.001 124.015 576.08 130 578.766C136 581.458 143 585.496 143 588.996V932.777C143 936.116 135.999 939.968 129.999 942.537C123.999 945.105 110.999 946.132 110.999 946.132C110.861 946.146 82.6665 948.994 70.6958 948.994C58.6955 948.993 31.9998 946.132 31.9998 946.132C31.9136 946.125 18.9799 945.095 12.9999 942.536C7.0001 939.967 -2.91872e-07 936.115 0 932.777V610.351L0.000976556 610.349C0.000959438 597.365 0.00101288 589.517 0.000976556 588.996C0.000879923 585.496 7.00102 581.458 13.0009 578.766C19.001 576.073 32.0008 574.996 32.0008 574.996C32.0986 574.986 60.3248 571.996 72.3042 571.996Z" fill="#FACC15"/>
+          <g class="bell__stop">
+            <rect class="bell__stopbtn" x="9" y="698" width="126" height="126" fill="#E11D25"/>
+            <text class="bell__stoptxt" x="72" y="760.5" text-anchor="middle" dominant-baseline="central">STOP</text>
+          </g>
+          <circle cx="71.5" cy="591.5" r="11.5" fill="#D9D9D9"/>
+          <circle cx="71.5" cy="930.5" r="11.5" fill="#D9D9D9"/>
+          <!-- screw slots: 18 x 4 bars, each pivoting on its own top-left corner the
+               way Pencil exports them (transform-origin: top left) -->
+          <g transform="translate(67 584) rotate(45)">
+            <rect width="18" height="4" fill="#747474"/>
+          </g>
+          <g transform="translate(63.4328 935.5522) rotate(-45)">
+            <rect width="18" height="4" fill="#747474"/>
+          </g>
+        </svg>
+      </button>
+
+      <footer class="panel__foot">
+        <span class="pill pill--live" id="dataPill">Loading dataset…</span>
+      </footer>
+    </aside>
+
+  </div>
+</main>
+
+<audio id="bellAudio" src="assets/bus-stop-bell.mp3" preload="auto"></audio>
+
+<script src="app.js"></script>
+</body>
+</html>
