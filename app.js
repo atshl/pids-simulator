@@ -107,7 +107,7 @@ async function init() {
     loadRoute();
   }
 
-  setInterval(tick, 1000);
+  setInterval(tick, 3000);
   requestAnimationFrame(loop);
 
   /* the sign is measured, so re-fit once the webfonts are in */
@@ -236,7 +236,7 @@ function loop() {
           S.requested = null;
           updateRequestButton();
         }
-        if (atEnd) { S.phase = 'dwell'; S.t = 0; setTimeout(()=>reverseDirection(),1000); }
+        if (atEnd) { S.phase = 'dwell'; S.t = 0; setTimeout(()=>reverseDirection(),3000); }
         else S.phase = 'move';
       }
     } else if (S.t >= S.legTime) {
