@@ -338,7 +338,9 @@ function visibleStops() {
 }
 
 function statusFor(entry, vi) {
-  if (entry.idx === S.route.length - 1) return 'final';
+  if (!entry) return 'upcoming';
+  const last = S.route && S.route.length ? S.route.length - 1 : -1;
+  if (entry.idx === last) return 'final';
   /* The red marker belongs to the stop the bell was rung for — while the bus
      is still approaching it, that stop is not the first column. */
   if (isBellStopping() && entry.idx === S.requested) return 'stopping';

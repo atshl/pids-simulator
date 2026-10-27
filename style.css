@@ -374,3 +374,5 @@ select.input option { background: var(--sg-ink); }
 }
 .pill--live.is-off { color: var(--sg-row-light); border-color: rgba(215, 224, 230, .18); }
 .pill--live.is-off::before { background: var(--sg-row-dark); box-shadow: none; }
+
+.marker--final img{width:25px;height:30px;max-width:25px;max-height:30px;display:block}
