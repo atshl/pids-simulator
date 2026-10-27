@@ -236,7 +236,7 @@ function loop() {
           S.requested = null;
           updateRequestButton();
         }
-        if (atEnd) reverseDirection();
+        if (atEnd) { S.phase = 'dwell'; S.t = 0; reverseDirection(); }
         else S.phase = 'move';
       }
     } else if (S.t >= S.legTime) {
