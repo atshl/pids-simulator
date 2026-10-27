@@ -326,16 +326,14 @@ function isBellStopping() {
   return S.requested != null && S.requested < S.route.length - 1;
 }
 
-/* Three changing stops plus the terminus, which is always the 4th column
-   (Figma Screens 1-4). */
+/* Upcoming stops only - show next stops up to 4, final appears when reached */
 function visibleStops() {
   const last = S.route.length - 1;
   const out = [];
   const head = (isBellStopping() && S.requested === S.pos) ? S.pos : S.pos + 1;
-  for (let i = head; i < last && out.length < 3; i++) {
+  for (let i = head; i <= last && out.length < 4; i++) {
     out.push({ idx: i, code: S.route[i], col: out.length });
   }
-  out.push({ idx: last, code: S.route[last], col: 3 });
   return out;
 }
 
